@@ -1,4 +1,4 @@
-import { TypeOf, array, number, object, string, z } from 'zod';
+import { TypeOf, array, boolean, number, object, string, z } from 'zod';
 
 const ListingType = z.enum(['rent', 'sale', 'lease']).superRefine((val, ctx) => {
   if (!['rent', 'sale', 'lease'].includes(val)) {
@@ -35,6 +35,12 @@ const listingPayload = {
     }),
     listedUnder: string({
       required_error: 'Listed under is required',
+    }),
+    isAccepted: boolean({
+      required_error: 'isAccepted is required',
+    }),
+    isPublished: boolean({
+      required_error: 'isPublished is required',
     }),
   }),
 };

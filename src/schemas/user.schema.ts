@@ -4,7 +4,7 @@ const createUserSchema = object({
   body: object({
     firstName: string({ required_error: 'First name is required' }),
     lastName: string({ required_error: 'Last name is required' }),
-    password: string({ required_error: 'Password is required' }).min(8, 'Password must be at least 8 characters'),
+    password: string({ required_error: 'Password is required' }).min(8, 'Password must be at least 8 characters long'),
     confirmPassword: string({ required_error: 'Confirm password is required' }),
     email: string({ required_error: 'Email is required' }).email('Email is invalid'),
     phoneNum: string({ required_error: 'Phone number is required' }),

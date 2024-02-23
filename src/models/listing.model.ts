@@ -14,7 +14,10 @@ export interface IListingInput {
   location: string;
   photos: string[];
   listingType: 'rent' | 'sale' | 'lease';
+  // propertyType: 'apartment' | 'house' | 'office' | 'land' | 'commercial';
   listedUnder: IUser['_id'];
+  isAccepted: boolean;
+  isPublished: boolean;
 }
 
 export interface IListing extends IListingInput, mongoose.Document {
@@ -78,6 +81,15 @@ const ListingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    // make sure other person accepts the listing
+    isAccepted: {
+      type: Boolean,
+      default: false,
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true },

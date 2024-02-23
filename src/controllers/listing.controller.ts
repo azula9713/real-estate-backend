@@ -40,7 +40,7 @@ const getAllListingsHandler = async (_req: Request, res: Response) => {
   }
 };
 
-const getMyListingsHandler = async (req: Request, res: Response) => {
+const getMyListingsHandler = async (_req: Request, res: Response) => {
   const userId = res.locals.user._id;
   try {
     // created by or listedUnder

@@ -6,6 +6,8 @@ export interface INotificationInput {
   createdBy: IUser['_id'];
   updatedBy: IUser['_id'];
   recipient: IUser['_id'];
+  beneficiary: IUser['_id'];
+  type: 'connection' | 'listing';
   message: string;
   read: boolean;
 }
@@ -32,10 +34,20 @@ const NotificationSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    beneficiary: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     message: {
       type: String,
       required: true,
       trim: true,
+    },
+    type: {
+      type: String,
+      required: true,
+      enum: ['connection', 'listing'],
     },
     read: {
       type: Boolean,

@@ -1,6 +1,6 @@
 import { omit } from 'lodash';
-
 import { FilterQuery } from 'mongoose';
+
 import UserModel, { IUser, UserInput } from '../models/user.model';
 import logger from '../utils/logger';
 

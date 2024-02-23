@@ -7,6 +7,7 @@ import {
   findConnection,
   findConnectionsForUser,
 } from '../services/connection.service';
+import { createNotification } from '../services/notification.service';
 import { findUser } from '../services/user.service';
 import logger from '../utils/logger';
 
@@ -38,6 +39,16 @@ const createConnectionHandler = async (req: Request<{}, {}, CreateConnectionInpu
 
   try {
     const connection = await createConnection({ ...req.body, createdBy: userId, updatedBy: userId });
+    // create notification
+    await createNotification({
+      createdBy: userId,
+      updatedBy: userId,
+      recipient: requestee,
+      beneficiary: requester,
+      type: 'connection',
+      message: `You have a new connection request from ${requester}`,
+      read: false,
+    });
     return res.send(connection);
   } catch (error) {
     logger.error('Error creating connection: ', error);
