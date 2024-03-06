@@ -9,6 +9,8 @@ import {
   findListing,
   findListings,
 } from '../services/listing.service';
+import { createNotification } from '../services/notification.service';
+import { findUser } from '../services/user.service';
 import logger from '../utils/logger';
 
 const createListingHandler = async (req: Request<{}, {}, CreateListingInput['body']>, res: Response) => {
@@ -23,6 +25,23 @@ const createListingHandler = async (req: Request<{}, {}, CreateListingInput['bod
 
   try {
     const listing = await createListing({ ...req.body, createdBy: userId, updatedBy: userId });
+
+    // if createdBy and listedUnder are different, create notification for listedUnder
+    if (listing.createdBy.toString() !== listing.listedUnder.toString()) {
+      console.log('listedUnder', listing.listedUnder);
+      console.log('createdBy', listing.createdBy);
+      const user = await findUser({ _id: userId });
+      // create notification
+      await createNotification({
+        createdBy: userId,
+        updatedBy: userId,
+        recipient: listing.listedUnder,
+        beneficiary: listing.createdBy,
+        type: 'listing',
+        message: `You have a new listing from ${user?.firstName} ${user?.lastName}`,
+        read: false,
+      });
+    }
     return res.send(listing);
   } catch (error) {
     logger.error('Error creating listing: ', error);

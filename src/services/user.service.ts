@@ -39,6 +39,16 @@ const findUser = async (query: FilterQuery<IUser>) => {
   return UserModel.findOne(query, { password: 0 }).lean();
 };
 
+const findUserSavedListings = async (userId: string) => {
+  const user = await UserModel.findById(userId, { savedListings: 1 }).populate('savedListings').lean().exec();
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return user.savedListings;
+};
+
 const findUsers = async (query: FilterQuery<IUser>) => {
   return UserModel.find(query, { password: 0 }).lean();
 };
@@ -47,4 +57,4 @@ const updateUser = async (id: string, update: Partial<IUser>) => {
   return UserModel.findByIdAndUpdate(id, update, { new: true }).lean();
 };
 
-export { createUser, findUser, findUsers, updateUser, validateUser };
+export { createUser, findUser, findUserSavedListings, findUsers, updateUser, validateUser };

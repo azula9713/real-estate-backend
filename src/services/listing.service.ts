@@ -8,6 +8,7 @@ const createListing = async (input: Omit<IListingInput, 'createdAt' | 'updatedAt
 
 const findAllListings = async () => {
   // populate is used to get the createdBy user details but hide the password and saved listings
+
   return ListingModel.find()
     .populate('createdBy', '-password -savedListings -createdAt -updatedAt')
     .populate('listedUnder', '-password -savedListings -createdAt -updatedAt')

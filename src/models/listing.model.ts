@@ -14,7 +14,7 @@ export interface IListingInput {
   location: string;
   photos: string[];
   listingType: 'rent' | 'sale' | 'lease';
-  // propertyType: 'apartment' | 'house' | 'office' | 'land' | 'commercial';
+  propertyType: 'apartment' | 'house' | 'office' | 'land' | 'commercial';
   listedUnder: IUser['_id'];
   isAccepted: boolean;
   isPublished: boolean;
@@ -71,6 +71,11 @@ const ListingSchema = new mongoose.Schema(
     listingType: {
       type: String,
       enum: ['rent', 'sale', 'lease'],
+      required: true,
+    },
+    propertyType: {
+      type: String,
+      enum: ['apartment', 'house', 'office', 'land', 'commercial'],
       required: true,
     },
     clickCount: {

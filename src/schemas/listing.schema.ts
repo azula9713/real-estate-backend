@@ -9,6 +9,15 @@ const ListingType = z.enum(['rent', 'sale', 'lease']).superRefine((val, ctx) => 
   }
 });
 
+const PropertyType = z.enum(['apartment', 'house', 'office', 'land', 'commercial']).superRefine((val, ctx) => {
+  if (!['apartment', 'house', 'office', 'land', 'commercial'].includes(val)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Property type must be either "apartment", "house", "office", "land", or "commercial"',
+    });
+  }
+});
+
 const listingPayload = {
   body: object({
     title: string({
@@ -30,6 +39,7 @@ const listingPayload = {
       }),
     ),
     listingType: ListingType,
+    propertyType: PropertyType,
     clickCount: number({
       required_error: 'Listing count is required',
     }),

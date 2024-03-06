@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import { CreateConnectionInput, GetConnectionInput } from '../schemas/connection.schema';
+import { CreateConnectionInput, GetConnectionInput, UpdateConnectionInput } from '../schemas/connection.schema';
 import {
   cancelConnection,
   checkConnectionExists,
   createConnection,
   findConnection,
   findConnectionsForUser,
+  updateConnection,
 } from '../services/connection.service';
 import { createNotification } from '../services/notification.service';
 import { findUser } from '../services/user.service';
@@ -39,6 +40,10 @@ const createConnectionHandler = async (req: Request<{}, {}, CreateConnectionInpu
 
   try {
     const connection = await createConnection({ ...req.body, createdBy: userId, updatedBy: userId });
+
+    const user = await findUser({ _id: requester });
+
+    if (!user) return res.status(404).send('User not found');
     // create notification
     await createNotification({
       createdBy: userId,
@@ -46,7 +51,7 @@ const createConnectionHandler = async (req: Request<{}, {}, CreateConnectionInpu
       recipient: requestee,
       beneficiary: requester,
       type: 'connection',
-      message: `You have a new connection request from ${requester}`,
+      message: `You have a new connection request from ${user?.firstName} ${user?.lastName}`,
       read: false,
     });
     return res.send(connection);
@@ -65,6 +70,28 @@ const getMyConnectionsHandler = async (_req: Request, res: Response) => {
     return res.send(connections);
   } catch (error) {
     logger.error('Error getting connections: ', error);
+    return res.status(500).send(error);
+  }
+};
+
+const updateConnectionHandler = async (req: Request<UpdateConnectionInput['params'], {}, UpdateConnectionInput['body']>, res: Response) => {
+  const userId = res.locals.user._id;
+  const { connectionId } = req.params;
+
+  try {
+    const connection = await findConnection({ _id: connectionId });
+    if (!connection) {
+      return res.status(404).send('Connection not found');
+    }
+
+    if (userId !== connection.requestee.toString()) {
+      return res.status(403).send('You are not authorized to update this connection');
+    }
+
+    const updatedConnection = await updateConnection({ _id: connectionId }, { ...req.body, updatedBy: userId });
+    return res.send(updatedConnection);
+  } catch (error) {
+    logger.error('Error updating connection: ', error);
     return res.status(500).send(error);
   }
 };
@@ -91,4 +118,4 @@ const cancelConnectionHandler = async (req: Request<GetConnectionInput['params']
   }
 };
 
-export { cancelConnectionHandler, createConnectionHandler, getMyConnectionsHandler };
+export { cancelConnectionHandler, createConnectionHandler, getMyConnectionsHandler, updateConnectionHandler };

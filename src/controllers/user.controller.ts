@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { CreateUserInput, GetAllUsersInput, UpdateUserInput } from '../schemas/user.schema';
-import { createUser, findUsers, updateUser } from '../services/user.service';
+import { createUser, findUserSavedListings, findUsers, updateUser } from '../services/user.service';
 
 import logger from '../utils/logger';
 
@@ -12,6 +12,17 @@ const createUserHandler = async (req: Request<{}, {}, CreateUserInput['body']>, 
   } catch (e) {
     logger.error(e);
     return res.status(409).send((e as Error).message); //Same email already exists
+  }
+};
+
+const getUserSavedListingsHandler = async (req: Request<{}, {}, {}>, res: Response) => {
+  const userId = res.locals.user._id;
+  try {
+    const user = await findUserSavedListings(userId);
+    return res.send(user);
+  } catch (error) {
+    logger.error('Error getting user saved listings: ', error);
+    return res.status(500).send(error);
   }
 };
 
@@ -38,4 +49,4 @@ const updateUserHandler = async (req: Request<{}, {}, UpdateUserInput['body']>, 
   }
 };
 
-export { createUserHandler, getAllUsersHandler, updateUserHandler };
+export { createUserHandler, getAllUsersHandler, getUserSavedListingsHandler, updateUserHandler };

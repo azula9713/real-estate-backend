@@ -11,7 +11,7 @@ const findNotification = async (query: FilterQuery<INotificationInput>, options:
 };
 
 const findNotificationsForUser = async (query: FilterQuery<INotificationInput>, options: QueryOptions = { lean: true }) => {
-  return NotificationModel.find(query, {}, options).populate('recipient');
+  return NotificationModel.find(query, {}, options).sort({ createdAt: -1 }).populate('recipient');
 };
 
 const updateNotification = async (

@@ -1,7 +1,20 @@
 import bcrypt from 'bcrypt';
 import config from 'config';
 import mongoose from 'mongoose';
+
 import { IListing } from './listing.model';
+
+export interface SavedFilter {
+  location: {
+    city?: string;
+    district?: string;
+  };
+  priceRange: {
+    min: number;
+    max: number;
+  };
+  propertyType?: string;
+}
 
 export interface UserInput {
   firstName: string;
@@ -12,6 +25,7 @@ export interface UserInput {
   phoneNum: string;
   profilePic: string;
   savedListings: IListing['_id'][];
+  savedFilters: SavedFilter[];
   location: string;
 }
 
@@ -30,31 +44,42 @@ const userSchema = new mongoose.Schema(
     userType: { type: Number, required: true, default: 0 }, //0:buyer, 1:seller 2:broker 3:admin
     phoneNum: { type: String, required: true, minlength: 10 },
     location: { type: String, required: true },
-    savedListings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing' }],
+    savedListings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing', default: [] }],
     profilePic: { type: String, required: true },
+    savedFilters: {
+      type: [
+        {
+          location: {
+            city: { type: String, required: false },
+            district: { type: String, required: false },
+          },
+          priceRange: {
+            min: { type: Number, required: false },
+            max: { type: Number, required: false },
+          },
+          propertyType: { type: String, required: false },
+          listingType: { type: String, required: false },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true },
 );
 
-userSchema.pre('save', async function (next) {
-  const user = this as IUser;
+userSchema.pre<IUser>('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
-  // only hash the password if it has been modified (or is new)
-  if (!user.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(config.get('saltWorkFactor'));
+  const hash = await bcrypt.hash(this.password, salt);
 
-  const salt = await bcrypt.genSalt(config.get<number>('saltWorkFactor'));
-  const hash = await bcrypt.hash(user.password, salt);
-
-  // Replace the password with the hash
-  user.password = hash;
+  this.password = hash;
 
   return next();
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword: string) {
-  const user = this as IUser;
-
-  return bcrypt.compare(candidatePassword, user.password).catch(() => false);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 const UserModel = mongoose.model<IUser>('User', userSchema);
