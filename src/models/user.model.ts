@@ -27,6 +27,7 @@ export interface UserInput {
   savedListings: IListing['_id'][];
   savedFilters: SavedFilter[];
   location: string;
+  rating?: number;
 }
 
 export interface IUser extends UserInput, mongoose.Document {
@@ -63,6 +64,7 @@ const userSchema = new mongoose.Schema(
       ],
       default: [],
     },
+    rating: { type: Number, required: false, default: 0 },
   },
   { timestamps: true },
 );

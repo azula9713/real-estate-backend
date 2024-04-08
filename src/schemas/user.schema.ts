@@ -30,6 +30,7 @@ const createUserSchema = object({
     userType: number({ required_error: 'User type is required', invalid_type_error: 'User type must be a number' }),
     savedListings: array(string()),
     savedFilters: array(savedFiltersSchema),
+    rating: number().optional(),
   }).refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
@@ -46,6 +47,8 @@ const updateUserSchema = object({
     profilePic: string({ required_error: 'Profile picture is required' }),
     userType: number({ required_error: 'User type is required', invalid_type_error: 'User type must be a number' }),
     savedListings: array(string()),
+    savedFilters: array(savedFiltersSchema),
+    rating: number().optional(),
   }),
 });
 

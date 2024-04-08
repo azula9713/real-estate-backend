@@ -10,6 +10,7 @@ export interface INotificationInput {
   type: 'connection' | 'listing';
   message: string;
   read: boolean;
+  deleted: boolean;
 }
 
 export interface INotification extends INotificationInput, mongoose.Document {
@@ -50,6 +51,11 @@ const NotificationSchema = new mongoose.Schema(
       enum: ['connection', 'listing'],
     },
     read: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    deleted: {
       type: Boolean,
       required: true,
       default: false,
