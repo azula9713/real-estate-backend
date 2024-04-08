@@ -40,6 +40,7 @@ const createListingHandler = async (req: Request<{}, {}, CreateListingInput['bod
         type: 'listing',
         message: `You have a new listing from ${user?.firstName} ${user?.lastName}`,
         read: false,
+        deleted: false,
       });
     }
     return res.send(listing);

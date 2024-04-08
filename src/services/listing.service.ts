@@ -16,11 +16,15 @@ const findAllListings = async () => {
 };
 
 const findListing = async (query: FilterQuery<IListingInput>, options: QueryOptions = { lean: true }) => {
-  return ListingModel.findOne(query, {}, options);
+  return ListingModel.findOne(query, {}, options)
+    .populate('createdBy', '-password -savedListings -createdAt -updatedAt')
+    .populate('listedUnder', '-password -savedListings -createdAt -updatedAt');
 };
 
 const findListings = async (query: FilterQuery<IListingInput>, options: QueryOptions = { lean: true }) => {
-  return ListingModel.find(query, {}, options);
+  return ListingModel.find(query, {}, options)
+    .populate('createdBy', '-password -savedListings -createdAt -updatedAt')
+    .populate('listedUnder', '-password -savedListings -createdAt -updatedAt');
 };
 
 const findAndUpdateListing = async (query: FilterQuery<IListingInput>, update: UpdateQuery<IListingInput>, options: QueryOptions) => {
